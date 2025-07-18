@@ -9,7 +9,7 @@ from aiogram import Bot, Dispatcher, html, Router, BaseMiddleware
 from aiogram import F
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart, Command, Text
+from aiogram.filters import CommandStart, Command
 from aiogram.filters.state import StateFilter
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -205,7 +205,7 @@ async def command_start_handler(message: Message, command: CommandObject, state:
     else:
         await message.answer("👋 Здравствуйте. Запустите бота по уникальной ссылке!")
 
-@router.message(Command("start_"), Text(startswith="/start_"))
+@router.message(Command("start_"), F.text(startswith="/start_"))
 async def handle_command(message: Message, state: FSMContext):
     
     user_send = message.text
@@ -1252,8 +1252,8 @@ async def process_time_selection(callback: CallbackQuery, state: FSMContext):
         user_data = await state.get_data()
         interview_time = parse_interview_datetime(date_value, time_value)
         interview_time_utc = interview_time.astimezone(SERVER_TZ)
-        task1 = asyncio.create_task(send_reminder_at_time(callback.message.chat.id, interview_time_utc - timedelta(hours=1), f"{user_data.get('text_7')}"))
-        task2 = asyncio.create_task(send_reminder_at_time(callback.message.chat.id, interview_time_utc, f"{user_data.get('text_8')}"))
+        task1 = asyncio.create_task(send_reminder_at_time(callback.message.chat.id, interview_time_utc - timedelta(hours=1), f"{user_data.get('notification_hour')}"))
+        task2 = asyncio.create_task(send_reminder_at_time(callback.message.chat.id, interview_time_utc, f"{user_data.get('notification_now')}"))
         
         await state.update_data(
         date_value=date_value,
