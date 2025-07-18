@@ -488,7 +488,7 @@ async def get_module_text(sheet_id, block_id, module_id):
 
 
 async def get_table_data(sheet_id, sheet_range, state: FSMContext,):
-    range_name = f"A{sheet_range}:CH{sheet_range}"
+    range_name = f"A{sheet_range}:CI{sheet_range}"
     value = await get_google_sheet_data(sheet_id, range_name)
     row_data = value[0]
     await state.update_data(
