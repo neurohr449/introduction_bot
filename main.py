@@ -164,7 +164,7 @@ async def notification_cb_handler(callback_query: CallbackQuery, state: FSMConte
     elif current_state == UserState.q10.state:
          await q10(callback_query.message, state)
 
-@router.message(CommandStart())
+@router.message(CommandStart('/start'))
 async def command_start_handler(message: Message, command: CommandObject, state: FSMContext) -> None:
     await state.set_state(UserState.welcome)
     args = command.args
