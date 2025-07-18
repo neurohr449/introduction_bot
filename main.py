@@ -170,8 +170,6 @@ async def command_start_handler(message: Message, command: CommandObject, state:
     args = command.args
     if args:
         parts = args.rsplit('_', 1)
-        sheet_id  = parts[0]
-        sheet_range = parts[1]    
         if len(parts) > 1 and parts[1].isdigit():  
             sheet_id = parts[0]  
             sheet_range = parts[1]  
@@ -200,8 +198,11 @@ async def command_start_handler(message: Message, command: CommandObject, state:
                 else:                    
                     await message.answer(f"{user_data.get('welcome')}")
             else:
-                await message.answer(f"Информация о модуле {user_data.get('module')}")
-                await pd1(message, state)
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                        [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                        ])
+                await message.answer(text = f"Нажмите на кнопку чтобы изучить модуль \"{user_data.get('module')}\"", reply_markup = keyboard)
+                
         except Exception as e:
             await message.answer(f"❌ Ошибка при загрузке данных: {str(e)}", reply_markup = FAIL_KEYBOARD)
     else:
