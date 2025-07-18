@@ -208,7 +208,7 @@ async def command_start_handler(message: Message, command: CommandObject, state:
     else:
         await message.answer("👋 Здравствуйте. Запустите бота по уникальной ссылке!")
 
-@router.message(Command("select_"))
+@router.message(F.text.startswith("/select_"))
 async def handle_command(message: Message, state: FSMContext):
     
     user_send = message.text
