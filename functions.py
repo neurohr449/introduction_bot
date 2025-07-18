@@ -92,7 +92,36 @@ async def get_google_sheet(sheet_id: str, list_index: int):
         print(f"Ошибка доступа к Google Sheets: {e}")
         raise
 
-
+async def get_google_sheet_text(sheet_id: str, list_index: int):
+    scope = ["https://www.googleapis.com/auth/spreadsheets"]
+    
+    # Создаем credentials
+    creds = Credentials.from_service_account_info({
+        "type": os.getenv("GS_TYPE"),
+        "project_id": os.getenv("GS_PROJECT_ID"),
+        "private_key_id": os.getenv("GS_PRIVATE_KEY_ID"),
+        "private_key": os.getenv("GS_PRIVATE_KEY").replace('\\n', '\n'),
+        "client_email": os.getenv("GS_CLIENT_EMAIL"),
+        "client_id": os.getenv("GS_CLIENT_ID"),
+        "auth_uri": os.getenv("GS_AUTH_URI"),
+        "token_uri": os.getenv("GS_TOKEN_URI"),
+        "auth_provider_x509_cert_url": os.getenv("GS_AUTH_PROVIDER_X509_CERT_URL"),
+        "client_x509_cert_url": os.getenv("GS_CLIENT_X509_CERT_URL"),
+        "universe_domain": os.getenv("UNIVERSE_DOMAIN")
+    }, scopes=scope)
+    
+    try:
+        # Асинхронная авторизация
+        client = await asyncio.to_thread(gspread.authorize, creds)
+        
+        # Асинхронное открытие таблицы и листа
+        spreadsheet = await asyncio.to_thread(client.open_by_key, sheet_id)
+        worksheet = await asyncio.to_thread(spreadsheet.get_worksheet, list_index)
+        data = await asyncio.to_thread(worksheet.get_all_records)
+        return data
+    except Exception as e:
+        print(f"Ошибка доступа к Google Sheets: {e}")
+        raise
 
 
 
@@ -466,8 +495,8 @@ def parse_interview_datetime(date_str: str, time_str: str) -> datetime:
 
 async def get_block_text(sheet_id, block_id):
         
-    sheet = await get_google_sheet(sheet_id, 1)
-    data = await asyncio.to_thread(sheet.get_all_records)
+    data = await get_google_sheet_text(sheet_id, 1)
+    
     
     for  row in data: 
         if block_id == row.get('Айди блока', ''):
@@ -477,8 +506,8 @@ async def get_block_text(sheet_id, block_id):
 
 async def get_module_text(sheet_id, block_id, module_id):
         
-    sheet = await get_google_sheet(sheet_id, 1)
-    data = await asyncio.to_thread(sheet.get_all_records)
+    data = await get_google_sheet_text(sheet_id, 1)
+    
     
     for  row in data: 
         if block_id == row.get('Айди блока', ''):
