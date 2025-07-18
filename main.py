@@ -164,7 +164,7 @@ async def notification_cb_handler(callback_query: CallbackQuery, state: FSMConte
     elif current_state == UserState.q10.state:
          await q10(callback_query.message, state)
 
-@router.message(CommandStart('/start'))
+@router.message(CommandStart())
 async def command_start_handler(message: Message, command: CommandObject, state: FSMContext) -> None:
     await state.set_state(UserState.welcome)
     args = command.args
@@ -200,13 +200,14 @@ async def command_start_handler(message: Message, command: CommandObject, state:
                 else:                    
                     await message.answer(f"{user_data.get('welcome')}")
             else:
+                await message.answer(f"Информация о модуле {user_data.get('module')}")
                 await pd1(message, state)
         except Exception as e:
             await message.answer(f"❌ Ошибка при загрузке данных: {str(e)}", reply_markup = FAIL_KEYBOARD)
     else:
         await message.answer("👋 Здравствуйте. Запустите бота по уникальной ссылке!")
 
-@router.message(F.text(startswith="/start_"))
+@router.message(F.text(startswith="/select_"))
 async def handle_command(message: Message, state: FSMContext):
     
     user_send = message.text
