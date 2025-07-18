@@ -175,9 +175,10 @@ async def command_start_handler(message: Message, command: CommandObject, state:
         if len(parts) > 1 and parts[1].isdigit():  
             sheet_id = parts[0]  
             sheet_range = parts[1]  
+            only_sheet = 0
         else:  
             sheet_id = args  
-            sheet_range = 3
+            sheet_range = 2
             only_sheet = 1
         
         print(f"sheetid {sheet_id}", "sheet_range",sheet_range)
