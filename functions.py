@@ -464,50 +464,101 @@ def parse_interview_datetime(date_str: str, time_str: str) -> datetime:
     date_obj = datetime.strptime(f"{date_part} {time_str}", "%d.%m.%Y %H:%M")
     return date_obj.replace(tzinfo=MOSCOW_TZ)  
 
-async def get_job_data(sheet_id, sheet_range, state: FSMContext,):
-    range_name = f"A{sheet_range}:AO{sheet_range}"
+async def get_block_text(sheet_id, block_id):
+        
+    sheet = await get_google_sheet(sheet_id, 1)
+    data = await asyncio.to_thread(sheet.get_all_records)
+    
+    for  row in data: 
+        if block_id == row.get('Айди блока', ''):
+            return row.get('Велкам сообщение', ''), row.get('Видео блока', '')
+    return 'Команда не найдена', None
+
+
+async def get_module_text(sheet_id, block_id, module_id):
+        
+    sheet = await get_google_sheet(sheet_id, 1)
+    data = await asyncio.to_thread(sheet.get_all_records)
+    
+    for  row in data: 
+        if block_id == row.get('Айди блока', ''):
+            if module_id == row.get('Айди модуля', ''):
+                return row.get('Второе сообщение', ''), row.get('Видео модуля', '')
+    return 'Команда не найдена', None       
+
+
+async def get_table_data(sheet_id, sheet_range, state: FSMContext,):
+    range_name = f"A{sheet_range}:CH{sheet_range}"
     value = await get_google_sheet_data(sheet_id, range_name)
     row_data = value[0]
     await state.update_data(
-        pd1=row_data[7],
-        pd2=row_data[8],
-        pd3=row_data[9],
-        pd4=row_data[10],
-        pd5=row_data[11],
-        q1=row_data[12],
-        q2=row_data[13],
-        q3=row_data[14],
-        q4=row_data[15],
-        q5=row_data[16],
-        q6=row_data[17],
-        q7=row_data[18],
-        q8=row_data[19],
-        q9=row_data[20],
-        q10=row_data[21],
-        portrait=row_data[27],
-        job_text=row_data[28],
-        company_name=row_data[4],
-        job_name=row_data[5],
-        score = row_data[6],
-        chat_id=row_data[1],
-        text_1=row_data[30],
-        text_2=row_data[31],
-        text_3=row_data[32],
-        text_4=row_data[33],
-        text_5=row_data[34],
-        text_6=row_data[35],
-        text_7=row_data[36],
-        text_8=row_data[37],
-        
-        decline_text = row_data[33],
-        learn_text = row_data[38],
-        practice_text = row_data[39],
-        accept_text = row_data[40],
-        
-        video_1=row_data[22],
-        video_2=row_data[23],
-        video_3=row_data[24],
-        video_4=row_data[25],
-        video_5=row_data[26]
+        welcome=row_data[0],
+        block=row_data[1],
+        second_message=row_data[2],
+        module=row_data[3],
+        block_id=row_data[4],
+        modile_id=row_data[5],
+        video_block=row_data[6],
+        video_module=row_data[7],
+
+        pd1=row_data[13],
+        pd2=row_data[14],
+        pd3=row_data[15],
+        pd4=row_data[16],
+        pd5=row_data[17],
+        pd6=row_data[18],
+        pd7=row_data[19],
+        pd8=row_data[20],
+        pd9=row_data[21],
+        pd10=row_data[22],
+        pd11=row_data[23],
+        pd12=row_data[24],
+        pd13=row_data[25],
+        pd14=row_data[26],
+        pd15=row_data[27],
+        pd16=row_data[28],
+        pd17=row_data[29],
+        pd18=row_data[30],
+        pd19=row_data[31],
+        pd20=row_data[32],
+        video_1=row_data[33],
+        video_2=row_data[34],
+        video_3=row_data[35],
+        video_4=row_data[36],
+        video_5=row_data[37],
+        video_6=row_data[38],
+        video_7=row_data[39],
+        video_8=row_data[40],
+        video_9=row_data[41],
+        video_10=row_data[42],
+        video_11=row_data[43],
+        video_12=row_data[44],
+        video_13=row_data[45],
+        video_14=row_data[46],
+        video_15=row_data[47],
+        video_16=row_data[48],
+        video_17=row_data[49],
+        video_18=row_data[50],
+        video_19=row_data[51],
+        video_20=row_data[52],
+        q1=row_data[53],
+        q2=row_data[54],
+        q3=row_data[55],
+        q4=row_data[56],
+        q5=row_data[57],
+        q6=row_data[58],
+        q7=row_data[59],
+        q8=row_data[60],
+        q9=row_data[61],
+        q10=row_data[62],
+        closing_text=row_data[63],
+        promt=row_data[64],
+        target_score = row_data[65],
+        test_tiser=row_data[66],
+        result_yes=row_data[67],
+        result_no=row_data[68],
+        notification_pd=row_data[69],
+        notification_hour=row_data[70],
+        notification_now=row_data[71]
         )
     
