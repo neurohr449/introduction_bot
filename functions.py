@@ -504,7 +504,7 @@ async def get_block_text(sheet_id, block_id):
     return 'Команда не найдена', None
 
 
-async def get_module_raenge(sheet_id, block_id, module_id):
+async def get_module_range(sheet_id, block_id, module_id):
         
     data = await get_google_sheet_text(sheet_id, 1)
     
