@@ -221,13 +221,20 @@ async def handle_command(message: Message, state: FSMContext):
     if len(parts) > 2:  
         block_id = parts[1]
         module_id = parts[2]
+        print(f"Sheet ID from state: {sheet_id}")
+        print(f"Block ID: {block_id}, Module ID: {module_id}")
         sheet_range = await get_module_range(sheet_id, block_id, module_id)
-        await get_table_data(sheet_id, sheet_range, state)
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                        [InlineKeyboardButton(text="Продолжить", callback_data="next")]
-                        ])
-        await message.answer(text = f"Нажмите на кнопку чтобы изучить модуль \"{user_data.get('module')}\"", reply_markup = keyboard)
-        
+        print(sheet_range)
+        if sheet_range is None:
+            await message.answer("Модуль не найден")
+        else:
+
+            await get_table_data(sheet_id, sheet_range, state)
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                            ])
+            await message.answer(text = f"Нажмите на кнопку чтобы изучить модуль \"{user_data.get('module')}\"", reply_markup = keyboard)
+            
     else:  
         block_id = parts[1]
         text, video = await get_block_text(sheet_id, block_id)

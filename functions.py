@@ -514,7 +514,7 @@ async def get_module_range(sheet_id, block_id, module_id):
             
             if str(module_id) == str(row.get('Айди модуля', '')):
                 return row
-    return 'Команда не найдена'    
+    return None  
 
 
 async def get_table_data(sheet_id, sheet_range, state: FSMContext,):
