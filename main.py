@@ -223,12 +223,11 @@ async def handle_command(message: Message, state: FSMContext):
         module_id = parts[2]
         
         sheet_range = await get_module_range(sheet_id, block_id, module_id)
-        sheet_range = sheet_range + 1
         
         if sheet_range is None:
             await message.answer("Модуль не найден")
         else:
-
+            await state.update_data(sheet_range=sheet_range)
             await get_table_data(sheet_id, sheet_range, state)
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                             [InlineKeyboardButton(text="Продолжить", callback_data="next")]
