@@ -214,7 +214,7 @@ async def handle_command(message: Message, state: FSMContext):
     user_send = message.text
 
     
-    parts = user_send.rsplit('_')
+    parts = user_send.split('_')
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
 
