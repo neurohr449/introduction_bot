@@ -228,12 +228,13 @@ async def handle_command(message: Message, state: FSMContext):
             await message.answer("Модуль не найден")
         else:
             await state.update_data(sheet_range=sheet_range)
-            update_status = await get_table_data(sheet_id, sheet_range, state)
-            if update_status == True:
-                keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                                [InlineKeyboardButton(text="Продолжить", callback_data="next")]
-                                ])
-                await message.answer(text = f"Нажмите на кнопку чтобы изучить модуль \"{user_data.get('module')}\"", reply_markup = keyboard)
+            user_data = await state.get_data()
+            await get_table_data(sheet_id, sheet_range, state)
+            
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                            ])
+            await message.answer(text = f"Нажмите на кнопку чтобы изучить модуль \"{user_data.get('module')}\"", reply_markup = keyboard)
             
     else:  
         block_id = parts[1]
