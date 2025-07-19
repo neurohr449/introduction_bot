@@ -499,7 +499,7 @@ async def get_block_text(sheet_id, block_id):
     print("block_id", block_id, data)
     
     for  row in data: 
-        if str(block_id) == row.get('Айди блока', ''):
+        if str(block_id) == str(row.get('Айди блока', '')):
             return row.get('Велкам сообщение', ''), row.get('Видео блока', '')
     return 'Команда не найдена', None
 
@@ -510,7 +510,7 @@ async def get_module_text(sheet_id, block_id, module_id):
     print("block_id", block_id,"module_id", module_id, data)
     
     for  row in data: 
-        if str(block_id) == row.get('Айди блока', ''):
+        if str(block_id) == str(row.get('Айди блока', '')):
             
             if str(module_id) == row.get('Айди модуля', ''):
                 return row.get('Второе сообщение', ''), row.get('Видео модуля', '')
