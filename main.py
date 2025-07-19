@@ -228,9 +228,9 @@ async def handle_command(message: Message, state: FSMContext):
             await message.answer("Модуль не найден")
         else:
             await state.update_data(sheet_range=sheet_range)
-            user_data = await state.get_data()
-            await get_table_data(sheet_id, sheet_range, state)
             
+            await get_table_data(sheet_id, sheet_range, state)
+            user_data = await state.get_data()
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                             [InlineKeyboardButton(text="Продолжить", callback_data="next")]
                             ])
