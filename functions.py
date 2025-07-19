@@ -496,25 +496,25 @@ def parse_interview_datetime(date_str: str, time_str: str) -> datetime:
 async def get_block_text(sheet_id, block_id):
         
     data = await get_google_sheet_text(sheet_id, 1)
-    print("block_id", block_id, data)
+    
     
     for  row in data: 
         if str(block_id) == str(row.get('Айди блока', '')):
-            return row.get('Велкам сообщение', ''), row.get('Видео блока', '')
+            return row.get('Второе сообщение', ''), row.get('Видео модуля', '')
     return 'Команда не найдена', None
 
 
-async def get_module_text(sheet_id, block_id, module_id):
+async def get_module_raenge(sheet_id, block_id, module_id):
         
     data = await get_google_sheet_text(sheet_id, 1)
-    print("block_id", block_id,"module_id", module_id, data)
+    
     
     for  row in data: 
         if str(block_id) == str(row.get('Айди блока', '')):
             
-            if str(module_id) == row.get('Айди модуля', ''):
-                return row.get('Второе сообщение', ''), row.get('Видео модуля', '')
-    return 'Команда не найдена', None       
+            if str(module_id) == str(row.get('Айди модуля', '')):
+                return row
+    return 'Команда не найдена'    
 
 
 async def get_table_data(sheet_id, sheet_range, state: FSMContext,):

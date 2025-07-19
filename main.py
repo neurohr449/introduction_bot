@@ -193,7 +193,7 @@ async def command_start_handler(message: Message, command: CommandObject, state:
             if only_sheet == 1:
                 match = re.search(TELEGRAM_VIDEO_PATTERN, user_data.get('video_block'))
                 if match:           
-                    await message.answer_video(video=user_data.get('video_1'))
+                    await message.answer_video(video=user_data.get('video_block'))
                     await message.answer(text=f"{user_data.get('welcome')}")  
                 else:                    
                     await message.answer(f"{user_data.get('welcome')}")
@@ -221,10 +221,12 @@ async def handle_command(message: Message, state: FSMContext):
     if len(parts) > 2:  
         block_id = parts[1]
         module_id = parts[2]
-        text, video = await get_module_text(sheet_id, block_id, module_id)
-        if video:
-            await message.answer_video(video)
-        await message.answer(text=text)
+        sheet_range = await get_module_range(sheet_id, block_id, module_id)
+        await get_table_data(sheet_id, sheet_range, state)
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                        [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                        ])
+        await message.answer(text = f"Нажмите на кнопку чтобы изучить модуль \"{user_data.get('module')}\"", reply_markup = keyboard)
         
     else:  
         block_id = parts[1]
