@@ -509,11 +509,11 @@ async def get_module_range(sheet_id, block_id, module_id):
     data = await get_google_sheet_text(sheet_id, 1)
     
     
-    for  row in data: 
+    for i, row in enumerate(data, start= 2): 
         if str(block_id) == str(row.get('Айди блока', '')):
             
             if str(module_id) == str(row.get('Айди модуля', '')):
-                return row
+                return i
     return None  
 
 
