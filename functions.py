@@ -594,4 +594,5 @@ async def get_table_data(sheet_id, sheet_range, state: FSMContext,):
         notification_hour=row_data[73],
         notification_now=row_data[74]
         )
+    return True
     
