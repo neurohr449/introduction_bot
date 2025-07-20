@@ -131,38 +131,18 @@ async def write_to_google_sheet(
     username: str,
     first_name: str = None,
     status: str = None,
-    gpt_response: str = None,
+    block_name: str = None,
+    module_name: str = None,
     full_name: str = None,
-    company_name: str = None,
-    job_name: str = None,
     phone_number: str = None,
-    resume_link: str = None,
     interview_date: str = None,
     interview_time: str = None,
     user_score: str = None,
+    gpt_response: str = None,
     qa_data: str = None
 ) -> bool:
-    """
-    Записывает или обновляет данные в Google Sheets с сохранением информации при отказе
-    
-    :param sheet_id: ID таблицы
-    :param username: @username пользователя (обязательный параметр)
-    :param first_name: Имя пользователя в Telegram
-    :param status: Один из вариантов: '1.Начал чат-бота', '2.Собеседование', '3.Отказ'
-    :param gpt_response: Комментарий AI (столбец O)
-    :param full_name: ФИО (столбец I)
-    :param company_name: Название компании (столбец G)
-    :param job_name: Название вакансии (столбец H)
-    :param phone_number: Номер телефона (столбец J)
-    :param resume_link: Ссылка на резюме (столбец K)
-    :param interview_date: Дата собеседования (столбец L)
-    :param interview_time: Время собеседования (столбец M)
-    :param user_score: Баллы (столбец N)
-    :param qa_data: Вопросы и ответы (столбец L)
-    :return: True если запись успешна, False при ошибке
-    """
     try:
-        # Проверка обязательного поля username
+        
         if not username:
             print("Ошибка: username обязателен")
             return False
@@ -186,8 +166,8 @@ async def write_to_google_sheet(
                 break
         
         # Блокируем изменения только если статус уже "Отказ" И мы не пытаемся его обновить
-        if user_row and data[user_row-2].get('Статус') == "Отказ" and status != "Отказ":
-            return False
+        # if user_row and data[user_row-2].get('Статус') == "Отказ" and status != "Отказ":
+        #     return False
         
         # Подготовка данных для обновления/добавления
         update_data = {}
@@ -199,9 +179,9 @@ async def write_to_google_sheet(
                 'ТГ': f"@{username}",
                 'Имя (ТГ)': first_name or "",
                 'Ссылка на переписку': f"https://t.me/{username}" or "",
-                'Статус': status or "1.Начал чат-бота",
-                'Название компании': company_name or "",
-                'Название вакансии': job_name or "",
+                'Статус': status or "Начал модуль",
+                'Название блока': block_name or "",
+                'Название модуля': module_name or "",
                 'День': current_day,
                 'Месяц': current_month,
                 'Год': current_year
@@ -218,31 +198,29 @@ async def write_to_google_sheet(
             update_data['ФИО'] = full_name
         if phone_number is not None:
             update_data['Номер'] = phone_number
-        if resume_link is not None:
-            update_data['Ссылка на резюме'] = resume_link
         if interview_date is not None:
-            update_data['Дата собеседования'] = interview_date
+            update_data['Дата встречи'] = interview_date
         if interview_time is not None:
-            update_data['Время собесдеования'] = interview_time
+            update_data['Время встречи'] = interview_time
         if qa_data is not None:
             update_data['Вопросы и ответы'] = qa_data
         if user_score is not None:
             update_data['Баллы'] = user_score
-        if company_name is not None:
-            update_data['Название компании'] = company_name
-        if job_name is not None:
-            update_data['Название вакансии'] = job_name
+        if block_name is not None:
+            update_data['Название блока'] = block_name
+        if module_name is not None:
+            update_data['Название модуля'] = module_name
         
         
         
         
         # При статусе "3.Отказ" гарантируем сохранение ключевых данных
-        if status == "3.Отказ":
-            update_data.update({
-                'ТГ': f"@{username}",
-                'Дата': current_date,
-                'Статус': "3.Отказ"
-            })
+        # if status == "3.Отказ":
+        #     update_data.update({
+        #         'ТГ': f"@{username}",
+        #         'Дата': current_date,
+        #         'Статус': "3.Отказ"
+        #     })
         
         # Если пользователь существует - обновляем строку, иначе добавляем новую
         if user_row:
@@ -259,24 +237,22 @@ async def write_to_google_sheet(
                 current_values.get('ТГ', ''),                     # B
                 current_values.get('Имя (ТГ)', ''),               # C
                 current_values.get('Ссылка на переписку', ''),    # D
-                current_values.get('Статус', ''),                 # E
-                '',                                               
-                current_values.get('Название компании', ''),      # G
-                current_values.get('Название вакансии', ''),      # H
-                current_values.get('ФИО', ''),                    # I
-                current_values.get('Номер', ''),                  # J
-                current_values.get('Ссылка на резюме', ''),       # K
-                current_values.get('Дата собеседования', ''),     # L
-                current_values.get('Время собесдеования', ''),    # M
-                current_values.get('Баллы', ''),                  # N
-                current_values.get('AI комент', ''),              # O
-                current_values.get('Вопросы и ответы', ''),       # P
-                current_values.get('День', ''),                   # Q
-                current_values.get('Месяц', ''),                  # R
-                current_values.get('Год', '')                     # S
+                current_values.get('Статус', ''),                 # E                                               
+                current_values.get('Название блока', ''),      # F
+                current_values.get('Название модуля', ''),      # G
+                current_values.get('ФИО', ''),                    # H
+                current_values.get('Номер', ''),                  # I
+                current_values.get('Дата встречи', ''),     # J
+                current_values.get('Время встречи', ''),    # K
+                current_values.get('Баллы', ''),                  # L
+                current_values.get('AI комент', ''),              # M
+                current_values.get('Вопросы и ответы', ''),       # N
+                current_values.get('День', ''),                   # O
+                current_values.get('Месяц', ''),                  # P
+                current_values.get('Год', '')                     # Q
             ]
             
-            await asyncio.to_thread(sheet.update, f'A{user_row}:S{user_row}', [row_values])
+            await asyncio.to_thread(sheet.update, f'A{user_row}:Q{user_row}', [row_values])
         else:
             # Формируем новую строку (все 15 столбцов A-O)
             new_row = [
@@ -284,21 +260,19 @@ async def write_to_google_sheet(
                 f"@{username}",                # B ТГ
                 first_name or "",              # C Имя (тг)
                 f"https://t.me/{username}",    # D (пустой)
-                status or "1.Начал чат-бота",  # E Статус
-                "",                            # F (пустой)
-                company_name or "",            # G Название компании
-                job_name or "",                # H Название вакансии
-                full_name or "",               # I ФИО
-                phone_number or "",            # J Номер
-                resume_link or "",             # K Ссылка на резюме
-                interview_date or "",          # L Дата собеседования
-                interview_time or "",          # M Время собеседования
-                user_score or "",              # N Баллы
-                gpt_response or "",            # O AI комент
-                qa_data or "",                 # P Вопросы и ответы
-                current_day,                   # Q День
-                current_month,                 # R Месяц
-                current_year                   # S Год
+                status or "Начал модуль",      # E Статус
+                block_name or "",              # F Название блока
+                module_name or "",             # G Название модуля
+                full_name or "",               # H ФИО
+                phone_number or "",            # I Номер
+                interview_date or "",          # J Дата встречи
+                interview_time or "",          # K Время встречи
+                user_score or "",              # L Баллы
+                gpt_response or "",            # M AI комент
+                qa_data or "",                 # N Вопросы и ответы
+                current_day,                   # O День
+                current_month,                 # P Месяц
+                current_year                   # Q Год
             ]
             await asyncio.to_thread(sheet.append_row, new_row)
         

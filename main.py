@@ -190,6 +190,18 @@ async def command_start_handler(message: Message, command: CommandObject, state:
                                     sheet_range=sheet_range)
             await get_table_data(sheet_id, sheet_range, state)
             user_data = await state.get_data()
+            user = message.from_user
+            username = user.username
+            first_name = user.first_name
+            block_name = user_data.get('block')
+            module_name = user_data.get('module')
+            await write_to_google_sheet(
+                                sheet_id = sheet_id, 
+                                username = username,
+                                first_name = first_name,
+                                block_name = block_name,
+                                module_name = module_name
+                         )
             if only_sheet == 1:
                 match = re.search(TELEGRAM_VIDEO_PATTERN, user_data.get('video_block'))
                 if match:           
@@ -260,41 +272,40 @@ async def pd1(callback_query: CallbackQuery, state: FSMContext):
             user = callback_query.from_user
             username = user.username
             first_name = user.first_name
-            company_name = user_data.get('company_name')
-            job_name = user_data.get('job_name')
-            user_check = await write_to_google_sheet(
+            block_name = user_data.get('block')
+            module_name = user_data.get('module')
+            await write_to_google_sheet(
                                 sheet_id = sheet_id, 
                                 username = username,
                                 first_name = first_name,
-                                company_name = company_name,
-                                job_name = job_name
+                                block_name = block_name,
+                                module_name = module_name,
+                                status = "ПД 1"
                          )
-            if user_check != False:
-                
-                user_data = await state.get_data()
-                text = user_data.get('pd1')
-                if text:
-                    match = re.search(TELEGRAM_VIDEO_PATTERN, user_data.get('video_1'))
-                    if match:           
-                        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                        [InlineKeyboardButton(text="Продолжить", callback_data="next")]
-                        ])
-                        await callback_query.message.answer_video(video=user_data.get('video_1'))
-                        await callback_query.message.answer(text=f"{user_data.get('pd1')}", reply_markup = keyboard)
-                        await state.set_state(UserState.pd1)
-                        await callback_query.answer()
-                    else:                    
-                        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                        [InlineKeyboardButton(text="Продолжить", callback_data="next")]
-                        ])
-                        await callback_query.message.answer(f"{user_data.get('pd1')}", reply_markup = keyboard)
-                        await state.set_state(UserState.pd1)
-                        await callback_query.answer()
-                else:
-                    await state.set_state(UserState.pd5)
-                    await q1(callback_query, state)     
+            
+            user_data = await state.get_data()
+            text = user_data.get('pd1')
+            if text:
+                match = re.search(TELEGRAM_VIDEO_PATTERN, user_data.get('video_1'))
+                if match:           
+                    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                    ])
+                    await callback_query.message.answer_video(video=user_data.get('video_1'))
+                    await callback_query.message.answer(text=f"{user_data.get('pd1')}", reply_markup = keyboard)
+                    await state.set_state(UserState.pd1)
+                    await callback_query.answer()
+                else:                    
+                    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                    ])
+                    await callback_query.message.answer(f"{user_data.get('pd1')}", reply_markup = keyboard)
+                    await state.set_state(UserState.pd1)
+                    await callback_query.answer()
             else:
-                 await callback_query.message.answer("Вы уже получили отказ")
+                await state.set_state(UserState.pd5)
+                await q1(callback_query, state)     
+        
     except Exception as e:
             await callback_query.message.answer(f"❌ Ошибка при загрузке данных: {str(e)}", reply_markup = FAIL_KEYBOARD)
 
@@ -304,6 +315,14 @@ async def pd1(callback_query: CallbackQuery, state: FSMContext):
 async def pd2(callback_query: CallbackQuery, state: FSMContext):
     
     user_data = await state.get_data()
+    sheet_id = user_data.get('sheet_id')
+    user = callback_query.from_user
+    username = user.username
+    await write_to_google_sheet(
+                                sheet_id = sheet_id, 
+                                username = username,
+                                status = "ПД 2"
+                         )
     text = user_data.get('pd2')
     if text:
         match = re.search(TELEGRAM_VIDEO_PATTERN, user_data.get('video_2'))
