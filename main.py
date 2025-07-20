@@ -2366,7 +2366,7 @@ async def q24(message: Message, state: FSMContext):
     text = user_data.get('q24')
     if text:
         await message.answer(f"{user_data.get('q24')}")
-        await state.set_state(UserState.q5)
+        await state.set_state(UserState.q24)
     else:
         await state.set_state(UserState.q40)
         await process_answers(message, state)
@@ -2556,7 +2556,7 @@ async def q33(message: Message, state: FSMContext):
     text = user_data.get('q33')
     if text:
         await message.answer(f"{user_data.get('q33')}")
-        await state.set_state(UserState.q4)
+        await state.set_state(UserState.q33)
     else:
         await state.set_state(UserState.q40)
         await process_answers(message, state)
@@ -2920,7 +2920,7 @@ async def process_time_selection(callback: CallbackQuery, state: FSMContext):
             f"Номер: {user_data.get('user_phone', 'Без телефона')}\n"
             f"Cылка на таблицу: https://docs.google.com/spreadsheets/d/{user_data.get('sheet_id')}\n\n"
             f"Баллы кандидата: {user_data.get('response_score')}\n\n"
-            f"AI комментарий: {user_data.get('ai_comment')}"
+            f"AI комментарий: {user_data.get('gpt_response_2')}"
             
         )
         
@@ -2990,7 +2990,7 @@ async def process_time_selection(callback: CallbackQuery, state: FSMContext):
             module_name=user_data.get('module'),
             full_name=user_data.get('user_fio'),
             phone_number=user_data.get('user_phone'),
-            gpt_response=user_data.get('gpt_response', ''),
+            gpt_response=user_data.get('gpt_response_2', ''),
             
             interview_date=date_value,
             interview_time=time_value,
