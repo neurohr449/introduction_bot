@@ -1522,7 +1522,7 @@ async def pd31(callback_query: CallbackQuery, state: FSMContext):
             ])
             await callback_query.message.answer_video(video=user_data.get('video_31'))
             await callback_query.message.answer(text=f"{user_data.get('pd31')}", reply_markup = keyboard)
-            await state.set_state(UserState.pd20)
+            await state.set_state(UserState.pd31)
             await callback_query.answer()
         else:
             
