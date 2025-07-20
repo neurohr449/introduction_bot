@@ -647,4 +647,6 @@ async def get_table_data(sheet_id, sheet_range, state: FSMContext,):
         notification_now=row_data[147]
         )
     
+    print(row_data)
+    
     
