@@ -1875,7 +1875,7 @@ async def q1(callback_query: CallbackQuery, state: FSMContext):
                                 username = username,
                                 status = "Вопрос 1"
     )
-    text = user_data.get('text_1')
+    text = user_data.get('test_tiser')
     text_2 = user_data.get('q1')
     if text and text_2:
         await callback_query.message.answer(f"{text}")
@@ -2911,7 +2911,7 @@ async def process_time_selection(callback: CallbackQuery, state: FSMContext):
 
         #Подготовка данных для записи
         record_text = (
-            f"{date_value} {time_value} #{user_data.get('response')}\n\n"
+            f"{date_value} {time_value}\n\n"
             f"Название блока: {user_data.get('block')}\n"
             f"Название модуля: {user_data.get('module')}\n\n"
             f"ФИО: {user_data.get('user_fio', 'Без имени')}\n"

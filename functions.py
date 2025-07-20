@@ -641,7 +641,7 @@ async def get_table_data(sheet_id, sheet_range, state: FSMContext,):
         processing_answers=row_data[141],
         result_yes=row_data[142],
         result_no=row_data[143],
-        confurmation_message=[144],
+        confurmation_message=row_data[144],
         notification_pd=row_data[145],
         notification_hour=row_data[143],
         notification_now=row_data[147]
