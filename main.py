@@ -394,38 +394,40 @@ async def handle_module_end_cb(callback_query: CallbackQuery, state: FSMContext)
 
 @router.message(F.text.startswith("/select_"))
 async def handle_command(message: Message, state: FSMContext):
-    
-    user_send = message.text
+    try:
+        user_send = message.text
 
-    
-    parts = user_send.split('_')
-    user_data = await state.get_data()
-    sheet_id = user_data.get('sheet_id')
+        
+        parts = user_send.split('_')
+        user_data = await state.get_data()
+        sheet_id = user_data.get('sheet_id')
 
-    if len(parts) > 2:  
-        block_id = parts[1]
-        module_id = parts[2]
-        
-        sheet_range = await get_module_range(sheet_id, block_id, module_id)
-        
-        if sheet_range is None:
-            await message.answer("Модуль не найден")
-        else:
-            await state.update_data(sheet_range=sheet_range)
+        if len(parts) > 2:  
+            block_id = parts[1]
+            module_id = parts[2]
             
-            await get_table_data(sheet_id, sheet_range, state)
-            user_data = await state.get_data()
-            keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
-                            ])
-            await message.answer(text = f"Нажмите на кнопку чтобы изучить модуль \"{user_data.get('module')}\"", reply_markup = keyboard)
+            sheet_range = await get_module_range(sheet_id, block_id, module_id)
             
-    else:  
-        block_id = parts[1]
-        text, video = await get_block_text(sheet_id, block_id)
-        if video: 
-            await message.answer_video(video)
-        await message.answer(text=text)
+            if sheet_range is None:
+                await message.answer("Модуль не найден")
+            else:
+                await state.update_data(sheet_range=sheet_range)
+                
+                await get_table_data(sheet_id, sheet_range, state)
+                user_data = await state.get_data()
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                                [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                                ])
+                await message.answer(text = f"Нажмите на кнопку чтобы изучить модуль \"{user_data.get('module')}\"", reply_markup = keyboard)
+                
+        else:  
+            block_id = parts[1]
+            text, video = await get_block_text(sheet_id, block_id)
+            if video: 
+                await message.answer_video(video)
+            await message.answer(text=text)
+    except Exception as e:
+        print(e)
         
 
 
