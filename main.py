@@ -371,6 +371,27 @@ async def command_start_handler(message: Message, command: CommandObject, state:
     else:
         await message.answer("👋 Здравствуйте. Запустите бота по уникальной ссылке!")
 
+
+async def handle_module_end(message: Message, state: FSMContext):
+    user_data = await state.get_data()
+    match = re.search(TELEGRAM_VIDEO_PATTERN, user_data.get('video_block'))
+    if match:           
+        await message.answer_video(video=user_data.get('video_block'))
+        await message.answer(text=f"{user_data.get('welcome')}")  
+    else:                    
+        await message.answer(f"{user_data.get('welcome')}")
+
+async def handle_module_end_cb(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+
+    match = re.search(TELEGRAM_VIDEO_PATTERN, user_data.get('video_block'))
+    if match:           
+        await callback_query.message.answer_video(video=user_data.get('video_block'))
+        await callback_query.message.answer(text=f"{user_data.get('welcome')}")  
+    else:                    
+        await callback_query.message.answer(f"{user_data.get('welcome')}")
+
+
 @router.message(F.text.startswith("/select_"))
 async def handle_command(message: Message, state: FSMContext):
     
@@ -1867,6 +1888,10 @@ async def pd40(callback_query: CallbackQuery, state: FSMContext):
 @router.callback_query(StateFilter(UserState.pd40))
 async def q1(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    questionare = user_data.get('questionare')
+    if questionare == "Нет":
+        await handle_quest_skip(callback_query, state)
+        return
     sheet_id = user_data.get('sheet_id')
     user = callback_query.from_user
     username = user.username
@@ -1875,6 +1900,9 @@ async def q1(callback_query: CallbackQuery, state: FSMContext):
                                 username = username,
                                 status = "Вопрос 1"
     )
+    
+        
+
     text = user_data.get('test_tiser')
     text_2 = user_data.get('q1')
     if text and text_2:
@@ -2778,7 +2806,7 @@ async def process_answers(message: Message, state: FSMContext):
             )
         text_3 = user_data.get('result_yes')
         await message.answer(text=text_3)
-        await message.answer("Пожалуйста напишите ваше имя.")
+        await message.answer("Пожалуйста, напишите ваше имя.")
     
     
     
@@ -2802,8 +2830,15 @@ async def process_answers(message: Message, state: FSMContext):
 
 
 
-
-
+async def handle_quest_skip(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    meeting = user_data.get('meeting')
+    if meeting == "Нет":
+        await handle_module_end_cb(callback_query, state)
+    else:
+        await state.set_state(UserState.result_yes)
+        await callback_query.message.answer("Пожалуйста, напишите ваше имя.")
+        
 @router.message(StateFilter(UserState.result_yes))
 async def process_name(message: Message, state: FSMContext):
         user_fio = message.text
@@ -3003,11 +3038,12 @@ async def process_time_selection(callback: CallbackQuery, state: FSMContext):
         interview_time_utc = interview_time.astimezone(SERVER_TZ)
         task1 = asyncio.create_task(send_reminder_at_time(callback.message.chat.id, interview_time_utc - timedelta(hours=1), f"{user_data.get('notification_hour')}"))
         task2 = asyncio.create_task(send_reminder_at_time(callback.message.chat.id, interview_time_utc, f"{user_data.get('notification_now')}"))
-        
+        task3 = asyncio.create_task(clear_state_after_delay(state))
+
         await state.update_data(
         date_value=date_value,
         time_value=time_value,
-        reminder_tasks=[id(task1), id(task2)]  
+        reminder_tasks=[id(task1), id(task2), id(task3)]  
         )
         if not success:
             await callback.message.answer("⚠️ Ошибка сохранения данных в таблицу")
@@ -3077,11 +3113,15 @@ async def send_reminder(chat_id: int, text: str):
     await bot.send_message(chat_id, text)
 
 
-async def send_reminder_at_time(chat_id: int, time_utc: datetime, text: str):
+async def send_reminder_at_time(chat_id: int, time_utc: datetime, text: str, state: FSMContext):
     delay = (time_utc - datetime.now(SERVER_TZ)).total_seconds()
     if delay > 0:
         await asyncio.sleep(delay)
         await send_reminder(chat_id, text)
+
+async def clear_state_after_delay(state: FSMContext, delay: int = 86400):
+    await asyncio.sleep(delay)
+    await state.clear()
 
 
 async def cancel_old_reminders(state: FSMContext):

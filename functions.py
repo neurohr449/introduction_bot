@@ -630,7 +630,7 @@ async def get_table_data(sheet_id, sheet_range, state: FSMContext,):
         q38 = row_data[132],
         q39 = row_data[133],
         q40 = row_data[134],
-        meeteng = row_data[135],
+        meeting = row_data[135],
 
 
         closing_text=row_data[136],
