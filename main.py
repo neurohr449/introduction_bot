@@ -395,8 +395,9 @@ async def handle_module_end_cb(callback_query: CallbackQuery, state: FSMContext)
 @router.message(F.text.startswith("/select_"))
 async def handle_command(message: Message, state: FSMContext):
     try:
-        user_send = message.text
 
+        user_send = message.text
+        await state.set_state(UserState.welcome)
         
         parts = user_send.split('_')
         user_data = await state.get_data()
