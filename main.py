@@ -2806,7 +2806,7 @@ async def process_answers(message: Message, state: FSMContext):
             )
         text_3 = user_data.get('result_yes')
         await message.answer(text=text_3)
-        await message.answer("Пожалуйста, напишите ваше имя.")
+        await handle_quest_skip_m(message, state)
     
     
     
@@ -2828,6 +2828,15 @@ async def process_answers(message: Message, state: FSMContext):
             
             )
 
+async def handle_quest_skip_m(message: Message, state: FSMContext):
+    user_data = await state.get_data()
+    meeting = user_data.get('meeting')
+    if meeting == "Нет":
+        await handle_module_end(message, state)
+    else:
+        await state.set_state(UserState.result_yes)
+        await message.answer("Пожалуйста, напишите ваше имя.")
+
 
 
 async def handle_quest_skip(callback_query: CallbackQuery, state: FSMContext):
@@ -2838,7 +2847,9 @@ async def handle_quest_skip(callback_query: CallbackQuery, state: FSMContext):
     else:
         await state.set_state(UserState.result_yes)
         await callback_query.message.answer("Пожалуйста, напишите ваше имя.")
-        
+
+
+
 @router.message(StateFilter(UserState.result_yes))
 async def process_name(message: Message, state: FSMContext):
         user_fio = message.text
