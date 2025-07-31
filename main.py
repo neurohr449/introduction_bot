@@ -3127,7 +3127,7 @@ async def send_reminder(chat_id: int, text: str):
     await bot.send_message(chat_id, text)
 
 
-async def send_reminder_at_time(chat_id: int, time_utc: datetime, text: str, state: FSMContext):
+async def send_reminder_at_time(chat_id: int, time_utc: datetime, text: str):
     delay = (time_utc - datetime.now(SERVER_TZ)).total_seconds()
     if delay > 0:
         await asyncio.sleep(delay)
