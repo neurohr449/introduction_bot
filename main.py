@@ -48,6 +48,7 @@ class UserState(StatesGroup):
     welcome = State()
     block = State()
     module = State()
+    gpt_1 = State()
     pd1 = State()
     pd2 = State()
     pd3 = State()
@@ -315,6 +316,66 @@ async def notification_cb_handler(callback_query: CallbackQuery, state: FSMConte
          await q40(callback_query.message, state)
 
 
+
+##################################################################################################################################################################################################################
+##################################################################################################################################################################################################################
+##################################################################################################################################################################################################################
+@router.callback_query(lambda c: c.data == 'gpt_question')
+async def gpt_question_1(callback_query: CallbackQuery, state: FSMContext):
+    current_state = await state.get_state()
+    await state.update_data(previous_state=current_state)
+    await state.set_state(UserState.gpt_1)
+    await callback_query.message.answer("Напишите ваш вопрос")
+
+
+@router.message(StateFilter(UserState.gpt_1))
+async def gpt_question_2(message: Message, state: FSMContext, current_state: State):
+    user_data = await state.get_data()
+    previous_state = user_data.get('previous_state')
+    assistant_id = user_data.get('assistant_id')
+    question = message.text
+    if previous_state:
+        await state.set_state(previous_state)
+    if assistant_id:  
+        thread = await client.beta.threads.create()
+        await client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=question
+        )
+        
+        run = await client.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=assistant_id
+        )
+        
+        while True:
+            run_status = await client.beta.threads.runs.retrieve(
+                thread_id=thread.id,
+                run_id=run.id
+            )
+            if run_status.status == "completed":
+                break
+            await asyncio.sleep(1)
+        
+        messages = await client.beta.threads.messages.list(thread.id)
+        result = messages.data[0].content[0].text.value
+    else:  
+        response = await client.chat.completions.create(
+            model="gpt-4.1",
+            messages=[{"role": "user", "content": question}]
+        )
+        result = response.choices[0].message.content
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить обучение", callback_data="notification")],
+            [InlineKeyboardButton(text="Задать еще вопрос", callback_data="gpt_question")]
+            ])
+    await message.answer (text = result, reply_markup = keyboard)
+##################################################################################################################################################################################################################
+##################################################################################################################################################################################################################
+##################################################################################################################################################################################################################
+
+
 @router.message(CommandStart())
 async def command_start_handler(message: Message, command: CommandObject, state: FSMContext) -> None:
     await state.set_state(UserState.welcome)
@@ -464,7 +525,8 @@ async def pd1(callback_query: CallbackQuery, state: FSMContext):
                 match = re.search(TELEGRAM_VIDEO_PATTERN, user_data.get('video_1'))
                 if match:           
                     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                    [InlineKeyboardButton(text="Продолжить", callback_data="next")],
+                    [InlineKeyboardButton(text="Задать вопрос", callback_data="gpt_question")]
                     ])
                     await callback_query.message.answer_video(video=user_data.get('video_1'))
                     await callback_query.message.answer(text=f"{user_data.get('pd1')}", reply_markup = keyboard)
@@ -472,7 +534,8 @@ async def pd1(callback_query: CallbackQuery, state: FSMContext):
                     await callback_query.answer()
                 else:                    
                     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+                    [InlineKeyboardButton(text="Продолжить", callback_data="next")],
+                    [InlineKeyboardButton(text="Задать вопрос", callback_data="gpt_question")]
                     ])
                     await callback_query.message.answer(f"{user_data.get('pd1')}", reply_markup = keyboard)
                     await state.set_state(UserState.pd1)
