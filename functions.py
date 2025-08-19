@@ -506,7 +506,7 @@ async def get_table_data(sheet_id, sheet_range, state: FSMContext,):
         video_block=row_data[8],
         video_module=row_data[9],
 
-        assistant_id = row_data[14],
+        assistant_id = row_data[12],
 
         pd1 = row_data[15],
         pd2 = row_data[16],
