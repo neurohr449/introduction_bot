@@ -17,7 +17,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.filters.command import CommandObject
 from aiogram.fsm.storage.redis import RedisStorage
-from redis.asyncio import ConnectionPool
+from redis.asyncio import Redis, ConnectionPool
 import shelve
 import gspread
 import re
@@ -42,10 +42,12 @@ redis_pool = ConnectionPool.from_url(
     os.getenv("REDIS_PUBLIC_URL"),
     decode_responses=True
 )
+redis_client = Redis(connection_pool=redis_pool)
+
 
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(
     parse_mode=ParseMode.HTML))
-storage = RedisStorage(connection_pool=redis_pool)
+storage = RedisStorage(redis=redis_client)
 router = Router()
 dp = Dispatcher(storage=storage)
 
