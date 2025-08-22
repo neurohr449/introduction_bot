@@ -16,6 +16,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.filters.command import CommandObject
+from aiogram.fsm.storage.redis import RedisStorage
+from redis.asyncio import ConnectionPool
 import shelve
 import gspread
 import re
@@ -36,11 +38,14 @@ client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 MOSCOW_TZ = ZoneInfo("Europe/Moscow")
 SERVER_TZ = ZoneInfo("UTC")
 TELEGRAM_VIDEO_PATTERN = r'https://t\.me/'
-
+redis_pool = ConnectionPool.from_url(
+    os.getenv("REDIS_PUBLIC_URL"),
+    decode_responses=True
+)
 
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(
     parse_mode=ParseMode.HTML))
-storage = MemoryStorage()
+storage = RedisStorage(connection_pool=redis_pool)
 router = Router()
 dp = Dispatcher(storage=storage)
 
