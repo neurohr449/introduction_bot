@@ -2987,7 +2987,7 @@ async def handle_quest_skip_m(message: Message, state: FSMContext):
             f"Cылка на таблицу: https://docs.google.com/spreadsheets/d/{user_data.get('sheet_id')}\n\n"
             f"AI комментарий: \n{user_data.get('gpt_response_2')}"
         )
-        print(record_text)
+        
         chat_id = user_data.get('chat_id')
         await bot.send_message(chat_id=chat_id,
                                 text=f"{record_text}",
