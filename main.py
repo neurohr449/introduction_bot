@@ -2979,6 +2979,7 @@ async def handle_quest_skip_m(message: Message, state: FSMContext):
     if meeting == "Нет":
 
         record_text = (
+            f"Обучение пройдено\n\n"
             f"Название блока: {user_data.get('block')}\n"
             f"Название модуля: {user_data.get('module')}\n\n"
             f"ТГ: @{message.from_user.username}\n"
@@ -3013,7 +3014,7 @@ async def handle_quest_skip_m(message: Message, state: FSMContext):
             await bot.send_voice(chat_id = chat_id,
                                  voice = voice)
             
-            
+
         await handle_module_end(message, state)
     else:
         await state.set_state(UserState.result_yes)
