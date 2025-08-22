@@ -2950,6 +2950,7 @@ async def process_answers(message: Message, state: FSMContext):
             )
         text_3 = user_data.get('result_yes')
         await message.answer(text=text_3)
+
         await handle_quest_skip_m(message, state)
     
     
@@ -2976,6 +2977,43 @@ async def handle_quest_skip_m(message: Message, state: FSMContext):
     user_data = await state.get_data()
     meeting = user_data.get('meeting')
     if meeting == "Нет":
+
+        record_text = (
+            f"Название блока: {user_data.get('block')}\n"
+            f"Название модуля: {user_data.get('module')}\n\n"
+            f"ТГ: @{message.from_user.username}\n"
+            f"Ссылка на переписку: https://t.me/{message.from_user.username}\n"
+            f"Cылка на таблицу: https://docs.google.com/spreadsheets/d/{user_data.get('sheet_id')}\n\n"
+            f"AI комментарий: {user_data.get('gpt_response_2')}"
+        )
+        print(record_text)
+        chat_id = user_data.get('chat_id')
+        await bot.send_message(chat_id=chat_id,
+                                text=f"{record_text}",
+                                disable_web_page_preview=True
+                                )
+        video = user_data.get('video')
+        if video:
+            await bot.send_video(chat_id=chat_id,
+                                video=video,
+                                caption="Видео от кандидата"
+                                )
+        
+        video_note = user_data.get('video_note')
+        if video_note:
+            await bot.send_video_note(chat_id=chat_id,
+                                video_note=video_note
+                                )
+        audio = user_data.get('audio')
+        if audio:
+             await bot.send_audio(chat_id = chat_id,
+                                  audio = audio)
+        voice = user_data.get('voice')
+        if voice:
+            await bot.send_voice(chat_id = chat_id,
+                                 voice = voice)
+            
+            
         await handle_module_end(message, state)
     else:
         await state.set_state(UserState.result_yes)
@@ -3099,7 +3137,7 @@ async def process_time_selection(callback: CallbackQuery, state: FSMContext):
         
         
 
-        #Подготовка данных для записи
+        
         record_text = (
             f"{date_value} {time_value}\n\n"
             f"Название блока: {user_data.get('block')}\n"
@@ -3134,9 +3172,9 @@ async def process_time_selection(callback: CallbackQuery, state: FSMContext):
                 [InlineKeyboardButton(text="Удалить запись", callback_data="delete_time")]
                 ])
         user_data = await state.get_data()
-        #Отправляем подтверждение пользователю
+        
         await callback.message.edit_text(
-            f"Ждем Вас в {date_value} в {time_value} на собеседование\n\n"
+            f"Ждем Вас в {date_value} в {time_value}\n\n"
             f"{user_data.get('confurmation_message')}", reply_markup=keyboard
         )
 
